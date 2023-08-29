@@ -6,10 +6,10 @@ name: .NET and Docker
 on:
   push:
     branches:
-      - development
+      - main
   pull_request:
     branches:
-      - development
+      - main
 
 jobs:
   build-and-deploy:
