@@ -14,7 +14,7 @@
             var geoUrl = $"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}";
 
             using var client = new HttpClient();
-            _logger.LogInformation("Calling OpenWeather API with url: {url}", geoUrl);
+            _logger.LogInformation("Gettung GetLatLon with: OpenWeather API with url: {url}", geoUrl);
 
             var response = await client.GetAsync(geoUrl);
             return await response.Content.ReadAsStringAsync();
@@ -25,9 +25,10 @@
             var sunriseSunsetUrl = $"https://api.sunrise-sunset.org/json?lat={lat}&lng={lon}&date={date:yyyy-MM-dd}&formatted=0";
 
             using var client = new HttpClient();
-            _logger.LogInformation("Calling OpenWeather API with url: {url}", sunriseSunsetUrl);
+            _logger.LogInformation("Getting SunriseSunset with: OpenWeather API with url: {url}", sunriseSunsetUrl);
 
             var response = await client.GetAsync(sunriseSunsetUrl);
+            _logger.LogInformation("Getting SunriseSunset succed... ");
             return await response.Content.ReadAsStringAsync();
         }
     }

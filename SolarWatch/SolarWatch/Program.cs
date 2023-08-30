@@ -14,6 +14,7 @@ builder.Services.AddTransient<IWeatherDataProvider, WeatherProvider>();
 builder.Services.AddTransient<IJsonProcessor, JsonProcessor>();
 
 builder.Services.AddTransient<ICityRepository, CityRepository>();
+builder.Services.AddTransient<ISunriseSunsetRepository, SunriseSunsetRepository>();
 
 var app = builder.Build();
 
