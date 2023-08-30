@@ -1,11 +1,17 @@
-﻿namespace SolarWatch.Models.SunriseSunset
+﻿using SolarWatch.Models.Cities;
+
+namespace SolarWatch.Models.SunriseSunset
 {
     public class SunriseSunsetResults
     {
-        public string City { get; set; }
+        public int Id { get; set; }
         public DateTime? Date { get; set; }
         public DateTimeOffset Sunrise { get; set; }
         public DateTimeOffset Sunset { get; set; }
+
+        public int CityId { get; set; }
+
+        public City City { get; set; }
 
     }
 }

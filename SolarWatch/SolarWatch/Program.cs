@@ -1,5 +1,6 @@
 using SolarWatch.Services;
 using SolarWatch.Services.Json;
+using SolarWatch.Services.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IWeatherDataProvider, WeatherProvider>();
 builder.Services.AddTransient<IJsonProcessor, JsonProcessor>();
+
+builder.Services.AddTransient<ICityRepository, CityRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

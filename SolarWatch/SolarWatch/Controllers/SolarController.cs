@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SolarWatch.Models;
+using SolarWatch.Models.Cities;
 using SolarWatch.Models.SunriseSunset;
 using SolarWatch.Services;
 using SolarWatch.Services.Json;
+using SolarWatch.Services.Repositories;
 
 
 namespace SolarWatch.Controllers
@@ -14,32 +17,40 @@ namespace SolarWatch.Controllers
         private readonly HttpClient _httpClient;
         private readonly IWeatherDataProvider _weatherDataProvider;
         private readonly IJsonProcessor _jsonProcessor;
+        private readonly ICityRepository _cityRepository;
 
         public SolarController(ILogger<SolarController> logger, IWeatherDataProvider weatherDataProvider,
-            IJsonProcessor jsonProcessor)
+            IJsonProcessor jsonProcessor, ICityRepository cityRepository)
         {
             _logger = logger;
             _weatherDataProvider = weatherDataProvider;
             _jsonProcessor = jsonProcessor;
             _httpClient = new HttpClient();
+            _cityRepository = cityRepository;
         }
-
 
         [HttpGet]
         [Route("api/solar")]
-        public async Task<ActionResult<SunriseSunsetResults>> GetSunriseSunset(string city, DateTime date)
+        public async Task<ActionResult<SunriseSunsetResults>> GetSunriseSunset(string cityName, DateTime date)
         {
-            try
+            var city = _cityRepository.GetByName(cityName);
+            if (city == null)
             {
-                var GeoData = await _weatherDataProvider.GetLatLon(city);
+                Console.WriteLine($"|City:{cityName} was not found in the DB|");
+                var GeoData = await _weatherDataProvider.GetLatLon(cityName);
                 var GeoResult = _jsonProcessor.GetGeocodingApiResponse(GeoData);
 
                 var lat = GeoResult.Coord.Lat;
                 var lon = GeoResult.Coord.Lon;
 
-                var weatherData = await _weatherDataProvider.GetSunriseSunset(lat, lon, date);
+                city = new City { Name = cityName, Coordinates = new Coordinates { Lat = lat, Lon = lon } };
+                await _cityRepository.AddAsync(city);
+            }
 
-                return Ok(_jsonProcessor.Process(weatherData, city, date));
+            try
+            {
+                var weatherData = await _weatherDataProvider.GetSunriseSunset(city.Coordinates.Lat, city.Coordinates.Lon, date);
+                return Ok(_jsonProcessor.Process(weatherData, cityName, date));
             }
             catch (Exception e)
             {
@@ -47,5 +58,6 @@ namespace SolarWatch.Controllers
                 return NotFound("Error getting weather data");
             }
         }
+
     }
 }

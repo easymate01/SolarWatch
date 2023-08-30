@@ -7,7 +7,7 @@ namespace SolarWatch.Services.Json
     {
         GeocodingApiResponse GetGeocodingApiResponse(string data);
 
-        SunriseSunsetResults Process(string data, string city, DateTime date);
+        SunriseSunsetResults Process(string data, string cityname, DateTime date);
 
     }
 }

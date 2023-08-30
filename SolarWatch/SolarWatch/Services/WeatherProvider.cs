@@ -11,7 +11,6 @@
 
         public async Task<string> GetLatLon(string city)
         {
-
             var geoUrl = $"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}";
 
             using var client = new HttpClient();
