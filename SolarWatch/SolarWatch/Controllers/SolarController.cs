@@ -56,14 +56,21 @@ namespace SolarWatch.Controllers
 
             try
             {
-                var sunriseSunset = await _sunriseSunsetRepository.GetByCityAndDateAsync(city.Id, date);
+                var sunriseSunset = await _sunriseSunsetRepository.GetByCityAndDateAsync(city.Id, date.Date);
                 if (sunriseSunset == null)
                 {
                     // Fetch sunrise/sunset data from external API
                     var weatherData = await _weatherDataProvider.GetSunriseSunset(city.Coordinates.Lat, city.Coordinates.Lon, date);
                     var sunriseSunsetData = _jsonProcessor.Process(weatherData, cityName, date);
-                    Console.WriteLine($"JSON PROCESS SUCCESS: {sunriseSunsetData.Sunrise}");
-                    //await _sunriseSunsetRepository.AddAsync(sunriseSunsetData);
+                    sunriseSunsetData.City = city;
+
+                    await _sunriseSunsetRepository.AddAsync(new SunriseSunsetResults
+                    {
+                        CityId = city.Id,
+                        Sunrise = sunriseSunsetData.Sunrise,
+                        Sunset = sunriseSunsetData.Sunset,
+                        Date = date
+                    });
 
                     Console.WriteLine("-------------");
                     Console.WriteLine($"| City:{sunriseSunsetData.City} was isnerted into the DB |");
@@ -80,6 +87,10 @@ namespace SolarWatch.Controllers
                 return NotFound("Error getting weather data");
             }
         }
+
+
+
+
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SolarWatch;
 
@@ -11,9 +12,11 @@ using SolarWatch;
 namespace SolarWatch.Migrations
 {
     [DbContext(typeof(SolarWatchApiContext))]
-    partial class SolarWatchApiContextModelSnapshot : ModelSnapshot
+    [Migration("20230901112111_UpdateSSCityId")]
+    partial class UpdateSSCityId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

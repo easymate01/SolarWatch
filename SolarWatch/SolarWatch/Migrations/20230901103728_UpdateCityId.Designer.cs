@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SolarWatch;
 
@@ -11,9 +12,11 @@ using SolarWatch;
 namespace SolarWatch.Migrations
 {
     [DbContext(typeof(SolarWatchApiContext))]
-    partial class SolarWatchApiContextModelSnapshot : ModelSnapshot
+    [Migration("20230901103728_UpdateCityId")]
+    partial class UpdateCityId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +67,8 @@ namespace SolarWatch.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                    b.HasIndex("CityId")
+                        .IsUnique();
 
                     b.ToTable("SunriseSunsetTimes");
                 });

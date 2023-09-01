@@ -43,7 +43,7 @@ namespace SolarWatch.Migrations
                 name: "IX_SunriseSunsetTimes_CityId",
                 table: "SunriseSunsetTimes",
                 column: "CityId",
-                unique: true);
+                unique: false);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cities_Name",

@@ -33,6 +33,10 @@ namespace SolarWatch
                     cb.Property(co => co.Lat).HasColumnName("Coordinates_Lat");
                     cb.Property(co => co.Lon).HasColumnName("Coordinates_Lon");
                 });
+
+            modelBuilder.Entity<SunriseSunsetResults>()
+                .HasIndex(ss => ss.CityId) // Törölje az egyedi indexet a CityId mezőről
+                .IsUnique(false); // Az IsUnique false-ra állítása engedi a duplikátumokat
         }
 
     }

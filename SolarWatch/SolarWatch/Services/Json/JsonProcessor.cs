@@ -44,6 +44,7 @@ namespace SolarWatch.Services.Json
                 Date = date,
                 Sunrise = DateTimeOffset.Parse(res.GetProperty("sunrise").GetString()).ToLocalTime(),
                 Sunset = DateTimeOffset.Parse(res.GetProperty("sunset").GetString()).ToLocalTime(),
+                CityId = city.Id
             };
 
             return latAndLon;
