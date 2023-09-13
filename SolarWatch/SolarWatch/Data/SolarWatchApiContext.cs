@@ -2,7 +2,7 @@
 using SolarWatch.Models.Cities;
 using SolarWatch.Models.SunriseSunset;
 
-namespace SolarWatch
+namespace SolarWatch.Data
 {
     public class SolarWatchApiContext : DbContext
     {
