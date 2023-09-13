@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SolarWatch.Models;
 using SolarWatch.Models.Cities;
 using SolarWatch.Models.SunriseSunset;
@@ -31,7 +32,7 @@ namespace SolarWatch.Controllers
             _sunriseSunsetRepository = sunriseSunsetRepository;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize(Roles = "User, Admin")]
         [Route("api/solar")]
         public async Task<ActionResult<SunriseSunsetResults>> GetSunriseSunset(string cityName, DateTime date)
         {
