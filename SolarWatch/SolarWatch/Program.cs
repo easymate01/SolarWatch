@@ -6,6 +6,8 @@ using SolarWatch.Services.Json;
 using SolarWatch.Services.Repositories;
 using System.Text;
 
+
+var configuration = Configuration();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -40,9 +42,18 @@ app.MapControllers();
 
 app.Run();
 
+IConfiguration Configuration()
+{
+    return new ConfigurationBuilder()
+        .SetBasePath(Directory.GetCurrentDirectory())
+        .AddJsonFile("appsettings.json")
+        .Build();
+}
 
 void AddAuthentication()
 {
+    var jwtSettings = configuration.GetSection("JwtSettings");
+
     builder.Services
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
@@ -54,10 +65,10 @@ void AddAuthentication()
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = "apiWithAuthBackend",
-                ValidAudience = "apiWithAuthBackend",
+                ValidIssuer = jwtSettings["ValidIssuer"],
+                ValidAudience = jwtSettings["ValidAudience"],
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes("!SomethingSecret!")
+                    Encoding.UTF8.GetBytes(jwtSettings["IssuerSigningKey"])
                 ),
             };
         });
