@@ -94,6 +94,8 @@ function App() {
     <>
       <div className="container">
         <div className="nav">
+          <Link to="/">Home</Link>
+
           <Link to="/login">Login</Link>
           <Link to="/register">Register</Link>
         </div>
