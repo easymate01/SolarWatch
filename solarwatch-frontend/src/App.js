@@ -10,6 +10,7 @@ function App() {
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [showRes, setShowRes] = useState(false);
+  const [deleted, setDeleted] = useState(false);
 
   const nextStep = () => {
     setStep(step + 1);
@@ -45,6 +46,36 @@ function App() {
       });
   }
 
+  const handleDelete = (e) => {
+    e.preventDefault();
+    fetch(`https://localhost:7008/Solar/DeleteByName?cityName=${city}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`City deletion failed with status: ${res.status}`);
+        }
+        return res.text(); // Parse response as text
+      })
+      .then((textResponse) => {
+        console.log("Delete response:", textResponse);
+        setDeleted(true);
+        setData([]);
+        setStep(1);
+        setCity("");
+        setDate("");
+        setShowRes(false);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Delete error:", error);
+      });
+  };
+
   function formatDate(dateString) {
     if (!dateString) {
       return " ";
@@ -76,7 +107,10 @@ function App() {
 
                   <input
                     type="text"
-                    onChange={(e) => setCity(e.target.value)}
+                    onChange={(e) => {
+                      setCity(e.target.value);
+                      setDeleted(false);
+                    }}
                     placeholder="city name"
                     value={city}
                   />
@@ -123,12 +157,16 @@ function App() {
                 <div>City: {city}</div>
                 <div>Sunrise: {formatDate(data.sunrise)}</div>
                 <div>Sunset: {formatDate(data.sunset)}</div>
+                <button className="small-btn">Edit city</button>
+                <button className="small-btn" onClick={handleDelete}>
+                  Delete city
+                </button>
               </>
             )}
           </div>
         )}
       </div>
-
+      {deleted && <div>City Deleted successfully ✅</div>}
       <div className="gradient"></div>
     </>
   );
