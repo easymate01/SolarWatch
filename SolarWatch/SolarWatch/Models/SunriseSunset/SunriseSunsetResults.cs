@@ -11,7 +11,6 @@ namespace SolarWatch.Models.SunriseSunset
         public DateTimeOffset Sunset { get; set; }
 
         public int CityId { get; set; }
-
         [JsonIgnore]
         public City City { get; set; }
 

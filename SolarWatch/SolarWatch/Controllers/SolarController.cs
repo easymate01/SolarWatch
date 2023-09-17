@@ -62,6 +62,7 @@ namespace SolarWatch.Controllers
                         Sunrise = sunriseSunsetData.Sunrise,
                         Sunset = sunriseSunsetData.Sunset,
                         CityId = city.Id,
+                        City = city,
                         Date = date
                     };
                     await _sunriseSunsetRepository.AddAsync(newResult);

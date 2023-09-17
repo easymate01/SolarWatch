@@ -11,7 +11,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 AddServices();
 ConfigureSwagger();
 AddDbContext();
@@ -38,7 +37,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
+Cors();
 app.Run();
 
 void AddIdentity()
@@ -176,4 +175,14 @@ async Task CreateAdminIfNotExists()
             await userManager.AddToRoleAsync(admin, "Admin");
         }
     }
+}
+
+void Cors()
+{
+    app.UseCors(builder =>
+    {
+        builder.AllowAnyOrigin(); // You can replace this with specific origins
+        builder.AllowAnyHeader();
+        builder.AllowAnyMethod();
+    });
 }
