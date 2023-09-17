@@ -30,6 +30,10 @@ function App() {
   }
 
   function formatDate(dateString) {
+    if (!dateString) {
+      return " ";
+    }
+
     const options = {
       month: "long",
       day: "numeric",
