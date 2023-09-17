@@ -42,6 +42,10 @@ function App() {
   return (
     <>
       <div className="container">
+        <div className="nav">
+          <Link to="/login">Login</Link>
+          <Link to="/register">Register</Link>
+        </div>
         {token != null ? (
           <div>
             <h1>Wellcome!</h1>
@@ -70,6 +74,7 @@ function App() {
         )}
         {data && (
           <div>
+            <h1>Response: </h1>
             <div>{city}</div>
             <div>Sunrise: {formatDate(data.sunrise)}</div>
             <div>Sunset: {formatDate(data.sunset)}</div>

@@ -48,7 +48,9 @@ a:hover {
   justify-content: center;
   text-align: center;
 }
-
+.nav a {
+  margin-right: 20px;
+}
 input {
   width: 300px;
   padding: 15px 50px;
