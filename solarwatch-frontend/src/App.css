@@ -19,9 +19,13 @@ a:hover {
 }
 
 .gradient {
+  position: fixed;
   --size: 250px;
   --speed: 50s;
   --easing: cubic-bezier(0.8, 0.2, 0.2, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
   width: var(--size);
   height: var(--size);
   filter: blur(calc(var(--size) / 5));
@@ -37,7 +41,12 @@ a:hover {
 }
 
 .container {
-  z-index: 100;
+  display: flex;
+  align-content: space-around;
+  flex-wrap: wrap;
+  flex-direction: column;
+  text-align: center;
+  margin-top: 50px;
 }
 .form {
   align-items: center;
@@ -94,4 +103,13 @@ textarea:focus,
 button:focus {
   outline: 0;
   box-shadow: 0 0 0 2px var(--c-gray-800), 0 0 0 4px var(--c-gray-300);
+}
+
+.response {
+  width: 400px;
+  position: fixed;
+  bottom: 20px;
+  border: 1px solid white;
+  border-radius: 15px;
+  padding: 10px;
 }

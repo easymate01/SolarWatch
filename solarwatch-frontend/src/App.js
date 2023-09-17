@@ -4,11 +4,24 @@ import "./App.css";
 
 function App() {
   const token = localStorage.getItem("token");
+  const [step, setStep] = useState(1);
   const [data, setData] = useState({});
   const [city, setCity] = useState("");
   const [date, setDate] = useState("");
-  function handleClick(e) {
+  const [loading, setLoading] = useState(true);
+  const [showRes, setShowRes] = useState(false);
+
+  const nextStep = () => {
+    setStep(step + 1);
+  };
+
+  const prevStep = () => {
+    setStep(step - 1);
+  };
+
+  function handleSubmit(e) {
     e.preventDefault();
+    setShowRes(true);
     fetch(
       `https://localhost:7008/Solar/GetByName?cityName=${city}&date=${date}`,
       {
@@ -23,6 +36,7 @@ function App() {
       .then((data) => {
         setData(data);
         console.log("Login response:", data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Login error:", error);
@@ -53,19 +67,40 @@ function App() {
         {token != null ? (
           <div>
             <h1>Wellcome!</h1>
-            <p>Please enter a city name</p>
             <form className="form">
-              <input
-                type="text"
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="city name"
-              ></input>
-              <input
-                type="text"
-                onChange={(e) => setDate(e.target.value)}
-                placeholder="date"
-              ></input>
-              <button onClick={handleClick}>Search</button>
+              {step === 1 && (
+                <>
+                  <p>1. Please enter a city name</p>
+
+                  <input
+                    type="text"
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="city name"
+                    value={city}
+                  />
+                  <button type="button" onClick={nextStep}>
+                    Next
+                  </button>
+                </>
+              )}
+              {step === 2 && (
+                <>
+                  <p>2. Please enter a date</p>
+
+                  <input
+                    type="text"
+                    onChange={(e) => setDate(e.target.value)}
+                    placeholder="date"
+                    value={date}
+                  />
+                  <button type="button" onClick={prevStep}>
+                    Previous
+                  </button>
+                  <button type="submit" onClick={handleSubmit}>
+                    Search
+                  </button>
+                </>
+              )}
             </form>
           </div>
         ) : (
@@ -76,12 +111,18 @@ function App() {
             </div>
           </>
         )}
-        {data && (
-          <div>
-            <h1>Response: </h1>
-            <div>{city}</div>
-            <div>Sunrise: {formatDate(data.sunrise)}</div>
-            <div>Sunset: {formatDate(data.sunset)}</div>
+        {showRes && (
+          <div className="response">
+            {loading ? (
+              <div>Loading...</div>
+            ) : (
+              <>
+                <h1>Response: </h1>
+                <div>City: {city}</div>
+                <div>Sunrise: {formatDate(data.sunrise)}</div>
+                <div>Sunset: {formatDate(data.sunset)}</div>
+              </>
+            )}
           </div>
         )}
       </div>
