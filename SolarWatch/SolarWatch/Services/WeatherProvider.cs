@@ -3,7 +3,7 @@
     public class WeatherProvider : IWeatherDataProvider
     {
         private readonly ILogger<WeatherProvider> _logger;
-        private readonly string apiKey = "de4ac831cb404cfba42750c4ad1aceb9";
+        private readonly string apiKey = "81801e606480c0782a26ad943cc4a746";
         public WeatherProvider(ILogger<WeatherProvider> logger)
         {
             _logger = logger;

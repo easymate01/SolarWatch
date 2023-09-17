@@ -15,7 +15,6 @@ namespace SolarWatch.Controllers
     public class SolarController : Controller
     {
         private readonly ILogger<SolarController> _logger;
-        private readonly HttpClient _httpClient;
         private readonly IWeatherDataProvider _weatherDataProvider;
         private readonly IJsonProcessor _jsonProcessor;
         private readonly ICityRepository _cityRepository;
@@ -27,13 +26,12 @@ namespace SolarWatch.Controllers
             _logger = logger;
             _weatherDataProvider = weatherDataProvider;
             _jsonProcessor = jsonProcessor;
-            _httpClient = new HttpClient();
             _cityRepository = cityRepository;
             _sunriseSunsetRepository = sunriseSunsetRepository;
         }
 
-        [HttpGet, Authorize(Roles = "User, Admin")]
-        [Route("api/solar")]
+
+        [HttpGet("GetByName"), Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<SunriseSunsetResults>> GetSunriseSunset(string cityName, DateTime date)
         {
             var city = _cityRepository.GetByName(cityName);
@@ -47,14 +45,7 @@ namespace SolarWatch.Controllers
 
                 city = new City { Name = cityName, Coordinates = new Coordinates { Lat = lat, Lon = lon } };
                 await _cityRepository.AddAsync(city);
-
-                Console.WriteLine("-------------");
-                Console.WriteLine($"| City:{city.Name} was created in the DB |");
-                Console.WriteLine("-------------");
-                Console.WriteLine();
-
             }
-
             try
             {
                 var sunriseSunset = await _sunriseSunsetRepository.GetByCityAndDateAsync(city.Id, date.Date);
@@ -65,19 +56,16 @@ namespace SolarWatch.Controllers
                     var sunriseSunsetData = _jsonProcessor.Process(weatherData, cityName, date);
                     sunriseSunsetData.City = city;
 
-                    await _sunriseSunsetRepository.AddAsync(new SunriseSunsetResults
+                    var newResult = new SunriseSunsetResults
                     {
-                        CityId = city.Id,
+                        Id = sunriseSunsetData.Id,
                         Sunrise = sunriseSunsetData.Sunrise,
                         Sunset = sunriseSunsetData.Sunset,
+                        CityId = city.Id,
                         Date = date
-                    });
-
-                    Console.WriteLine("-------------");
-                    Console.WriteLine($"| City:{sunriseSunsetData.City} was isnerted into the DB |");
-                    Console.WriteLine("-------------");
-                    Console.WriteLine();
-                    return Ok(sunriseSunsetData);
+                    };
+                    await _sunriseSunsetRepository.AddAsync(newResult);
+                    return Ok(newResult);
                 }
 
                 return Ok(sunriseSunset);
@@ -88,10 +76,5 @@ namespace SolarWatch.Controllers
                 return NotFound("Error getting weather data");
             }
         }
-
-
-
-
-
     }
 }

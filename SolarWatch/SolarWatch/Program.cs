@@ -9,86 +9,37 @@ using SolarWatch.Services.Json;
 using SolarWatch.Services.Repositories;
 using System.Text;
 
-
-var configuration = Configuration();
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-AddAuthentication();
+
 AddServices();
 ConfigureSwagger();
+AddDbContext();
+AddAuthentication();
 AddIdentity();
 
-builder.Services.AddDbContext<UsersContext>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-
-
 var app = builder.Build();
+AddAdmin();
+AddRoles();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllers();
 
-AddRoles();
-AddAdmin();
+
 app.Run();
-
-IConfiguration Configuration()
-{
-    return new ConfigurationBuilder()
-        .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json")
-        .Build();
-}
-
-void AddServices()
-{
-    builder.Services.AddControllers();
-    builder.Services.AddScoped<IAuthService, AuthService>();
-    builder.Services.AddTransient<IWeatherDataProvider, WeatherProvider>();
-    builder.Services.AddTransient<IJsonProcessor, JsonProcessor>();
-
-    builder.Services.AddTransient<ICityRepository, CityRepository>();
-    builder.Services.AddTransient<ISunriseSunsetRepository, SunriseSunsetRepository>();
-
-    builder.Services.AddScoped<ITokenService, TokenService>();
-}
-void AddAuthentication()
-{
-    var jwtSettings = configuration.GetSection("JwtSettings");
-
-    builder.Services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters()
-            {
-                ClockSkew = TimeSpan.Zero,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings["ValidIssuer"],
-                ValidAudience = jwtSettings["ValidAudience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings["IssuerSigningKey"])
-                ),
-            };
-        });
-}
 
 void AddIdentity()
 {
@@ -103,8 +54,29 @@ void AddIdentity()
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
         })
-        .AddRoles<IdentityRole>() //Enable Identity roles 
+        .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<UsersContext>();
+}
+
+void AddAuthentication()
+{
+    builder.Services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ClockSkew = TimeSpan.Zero,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidIssuer = "apiWithAuthBackend",
+                ValidAudience = "apiWithAuthBackend",
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes("!SomethingSecret!")
+                ),
+            };
+        });
 }
 
 void ConfigureSwagger()
@@ -128,8 +100,8 @@ void ConfigureSwagger()
                 {
                     Reference = new OpenApiReference
                     {
-                        Type=ReferenceType.SecurityScheme,
-                        Id="Bearer"
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
                     }
                 },
                 new string[]{}
@@ -138,9 +110,32 @@ void ConfigureSwagger()
     });
 }
 
+
+void AddServices()
+{
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
+    builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<ITokenService, TokenService>();
+
+
+    builder.Services.AddSingleton<IWeatherDataProvider, WeatherProvider>();
+    builder.Services.AddSingleton<IJsonProcessor, JsonProcessor>();
+    builder.Services.AddSingleton<ICityRepository, CityRepository>();
+    builder.Services.AddSingleton<ISunriseSunsetRepository, SunriseSunsetRepository>();
+
+}
+
+void AddDbContext()
+{
+    builder.Services.AddDbContext<UsersContext>();
+    builder.Services.AddDbContext<SolarWatchApiContext>();
+}
+
 void AddRoles()
 {
-    using var scope = app.Services.CreateScope(); // RoleManager is a scoped service, therefore we need a scope instance to access it
+    using var scope = app.Services.CreateScope();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
     var tAdmin = CreateAdminRole(roleManager);
@@ -152,12 +147,12 @@ void AddRoles()
 
 async Task CreateAdminRole(RoleManager<IdentityRole> roleManager)
 {
-    await roleManager.CreateAsync(new IdentityRole("Admin")); //The role string should better be stored as a constant or a value in appsettings
+    await roleManager.CreateAsync(new IdentityRole("Admin"));
 }
 
 async Task CreateUserRole(RoleManager<IdentityRole> roleManager)
 {
-    await roleManager.CreateAsync(new IdentityRole("User")); //The role string should better be stored as a constant or a value in appsettings
+    await roleManager.CreateAsync(new IdentityRole("User"));
 }
 
 void AddAdmin()
@@ -170,8 +165,8 @@ async Task CreateAdminIfNotExists()
 {
     using var scope = app.Services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var adminInDb = await userManager.FindByEmailAsync("admin@admin.com");
-    if (adminInDb == null)
+    var adminDB = await userManager.FindByEmailAsync("admin@admin.com");
+    if (adminDB == null)
     {
         var admin = new IdentityUser { UserName = "admin", Email = "admin@admin.com" };
         var adminCreated = await userManager.CreateAsync(admin, "admin123");

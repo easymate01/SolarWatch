@@ -1,4 +1,5 @@
 ﻿using SolarWatch.Models.Cities;
+using System.Text.Json.Serialization;
 
 namespace SolarWatch.Models.SunriseSunset
 {
@@ -11,6 +12,7 @@ namespace SolarWatch.Models.SunriseSunset
 
         public int CityId { get; set; }
 
+        [JsonIgnore]
         public City City { get; set; }
 
     }

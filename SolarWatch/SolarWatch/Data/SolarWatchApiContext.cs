@@ -17,7 +17,6 @@ namespace SolarWatch.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<City>()
                 .HasOne(c => c.SunriseSunsetInfo) // City has one SunriseSunsetResults
                 .WithOne(ss => ss.City) // SunriseSunsetResults has one City

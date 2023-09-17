@@ -9,18 +9,18 @@ using SolarWatch.Data;
 
 #nullable disable
 
-namespace SolarWatch.Migrations
+namespace SolarWatch.Migrations.SolarWatchApi
 {
     [DbContext(typeof(SolarWatchApiContext))]
-    [Migration("20230830181957_UpdatedModel")]
-    partial class UpdatedModel
+    [Migration("20230917160710_initialMigrations")]
+    partial class initialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("ProductVersion", "7.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -33,17 +33,9 @@ namespace SolarWatch.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -75,8 +67,7 @@ namespace SolarWatch.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId")
-                        .IsUnique();
+                    b.HasIndex("CityId");
 
                     b.ToTable("SunriseSunsetTimes");
                 });
