@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SolarWatch.DTOs;
 using SolarWatch.Models;
 using SolarWatch.Models.Cities;
 using SolarWatch.Models.SunriseSunset;
@@ -75,6 +76,51 @@ namespace SolarWatch.Controllers
             {
                 _logger.LogError(e, "Error getting weather data");
                 return NotFound("Error getting weather data");
+            }
+        }
+
+        [HttpPut("UpdateCityData"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UpdateCityByName(string cityName, [FromBody] CityUpdateDTO cityUpdateModel)
+        {
+            var city = _cityRepository.GetByName(cityName);
+            City cityToUpdate = new City();
+            cityToUpdate = city;
+
+            try
+            {
+                if (cityToUpdate == null)
+                {
+                    return NotFound("Error finding city, provide an existing city name");
+                }
+
+                await _cityRepository.UpdateAsync(cityToUpdate);
+
+                return Ok("City updated successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating city");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("DeleteByName"), Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteByName(string cityName)
+        {
+            var city = _cityRepository.GetByName(cityName);
+            if (city == null)
+            {
+                return NotFound("Error finding city, provide an existing city name");
+            }
+            try
+            {
+                await _cityRepository.DeleteAsync(city);
+                return Ok("City deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting city");
+                return StatusCode(500, "Internal server error");
             }
         }
     }

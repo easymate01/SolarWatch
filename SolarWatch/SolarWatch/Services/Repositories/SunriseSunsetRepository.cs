@@ -6,7 +6,11 @@ namespace SolarWatch.Services.Repositories
 {
     public class SunriseSunsetRepository : ISunriseSunsetRepository
     {
-
+        public async Task<IEnumerable<SunriseSunsetResults>> GetAll()
+        {
+            using var dbContext = new SolarWatchApiContext();
+            return await dbContext.SunriseSunsetTimes.ToListAsync();
+        }
         public async Task<SunriseSunsetResults> GetByCityAndDateAsync(int cityId, DateTime date)
         {
             using var dbContext = new SolarWatchApiContext();
@@ -34,6 +38,20 @@ namespace SolarWatch.Services.Repositories
                     Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
                 }
             }
+        }
+
+        public async Task Delete(SunriseSunsetResults sunrise)
+        {
+            using var dbContext = new SolarWatchApiContext();
+            dbContext.Remove(sunrise);
+            await dbContext.SaveChangesAsync();
+        }
+
+        public async Task Update(SunriseSunsetResults sunrise)
+        {
+            using var dbContext = new SolarWatchApiContext();
+            dbContext.Update(sunrise);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

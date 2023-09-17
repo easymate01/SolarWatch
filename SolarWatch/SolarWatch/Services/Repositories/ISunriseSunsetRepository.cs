@@ -6,5 +6,9 @@ namespace SolarWatch.Services.Repositories
     {
         Task<SunriseSunsetResults> GetByCityAndDateAsync(int cityId, DateTime date);
         Task AddAsync(SunriseSunsetResults sunriseSunset);
+        Task<IEnumerable<SunriseSunsetResults>> GetAll();
+
+        Task Delete(SunriseSunsetResults city);
+        Task Update(SunriseSunsetResults city);
     }
 }

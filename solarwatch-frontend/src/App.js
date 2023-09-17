@@ -13,10 +13,12 @@ function App() {
 
   const nextStep = () => {
     setStep(step + 1);
+    setShowRes(false);
   };
 
   const prevStep = () => {
     setStep(step - 1);
+    setShowRes(false);
   };
 
   function handleSubmit(e) {
