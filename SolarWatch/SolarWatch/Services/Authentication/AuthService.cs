@@ -58,16 +58,10 @@ public class AuthService : IAuthService
             return InvalidPassword(email, managedUser.UserName);
         }
 
-        if (managedUser.Email == "admin@admin.com")
-        {
-            var adminAccessToken = _tokenService.CreateToken(managedUser, "Admin"); //We didn't have a token creator for admin role, every person got a "User" role no matter what.
-            return new AuthResult(true, managedUser.Email, managedUser.UserName, adminAccessToken);   //This solution for the problem is amateur, but as I have lack of knowledge, for now I couldn't figure out a better solution.
-        }
-        else
-        {
-            var accessToken = _tokenService.CreateToken(managedUser, "User");
-            return new AuthResult(true, managedUser.Email, managedUser.UserName, accessToken);
-        }
+        var roles = await _userManager.GetRolesAsync(managedUser);
+        var role = roles.First();
+        var adminAccessToken = _tokenService.CreateToken(managedUser, role);
+        return new AuthResult(true, managedUser.Email, managedUser.UserName, adminAccessToken);
     }
 
     private static AuthResult InvalidEmail(string email)
