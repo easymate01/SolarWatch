@@ -51,7 +51,6 @@ const LoggingForm = ({ isHandleRegister, isLogin }) => {
       .then((data) => {
         console.log("Login response:", data);
         if (data.token) {
-          // Save the token to local storage or a state variable, depending on your application's architecture
           localStorage.setItem("token", data.token);
         }
         navigate("/");
@@ -74,7 +73,7 @@ const LoggingForm = ({ isHandleRegister, isLogin }) => {
             <div className="subtitle">Let's create your account!</div>
           </>
         )}
-        {isHandleRegister ?? (
+        {isHandleRegister && (
           <div className="input-container ic1">
             <input
               id="firstname"
