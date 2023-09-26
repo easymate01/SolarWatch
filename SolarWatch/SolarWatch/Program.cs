@@ -40,6 +40,10 @@ app.MapControllers();
 Cors();
 app.Run();
 
+
+
+
+
 void AddIdentity()
 {
     builder.Services
@@ -186,3 +190,5 @@ void Cors()
         builder.AllowAnyMethod();
     });
 }
+
+public partial class Program { }
