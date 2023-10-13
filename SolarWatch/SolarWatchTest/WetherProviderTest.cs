@@ -16,7 +16,7 @@ namespace SolarWatchTest
         [SetUp]
         public void Setup()
         {
-            string connectionString = "Server=localhost,1433;Database=SolarWatchApi;User Id=sa;Password=yourStrong(!)Password;Encrypt=True;TrustServerCertificate=True;\"";
+            string connectionString = "Server=localhost,1433;Database=SolarWatchApi;User Id=sa;Password=yourStrong(!)Password;Encrypt=True;TrustServerCertificate=True;";
             Environment.SetEnvironmentVariable("CONNECTION_STRING", connectionString);
             var options = new JsonSerializerOptions
             {
