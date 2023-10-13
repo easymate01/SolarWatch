@@ -29,7 +29,7 @@ namespace SolarWatchTest
             string jsonString = JsonSerializer.Serialize(authRequest);
             StringContent jsonStringContent = new StringContent(jsonString);
             jsonStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var response = _client.PostAsync("/Login", jsonStringContent).Result;
+            var response = _client.PostAsync("Auth/Login", jsonStringContent).Result;
             var content = response.Content.ReadAsStringAsync().Result;
             var desContent = JsonSerializer.Deserialize<AuthResponse>(content, options);
             var token = desContent.Token;
@@ -51,7 +51,6 @@ namespace SolarWatchTest
             var responseContent = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<SunriseSunsetResults>(responseContent, _jsonOptions);
 
-            // Add your specific assertions on the result here
         }
 
         [OneTimeTearDown]
