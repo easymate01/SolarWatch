@@ -16,50 +16,76 @@ namespace SolarWatchTest
         [SetUp]
         public void Setup()
         {
-            string connectionString = "Server=localhost,1433;Database=SolarWatchApi;User Id=sa;Password=yourStrong(!)Password;Encrypt=True;TrustServerCertificate=True;";
-            Environment.SetEnvironmentVariable("CONNECTION_STRING", connectionString);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            _client = CreateClient();
-
-            AuthRequest authRequest = new AuthRequest("gulyasmate21@gmail.com", "123456");
-            string jsonString = JsonSerializer.Serialize(authRequest);
-            StringContent jsonStringContent = new StringContent(jsonString);
-            jsonStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var response = _client.PostAsync("Auth/Login", jsonStringContent).Result;
-            var content = response.Content.ReadAsStringAsync().Result;
-            var desContent = JsonSerializer.Deserialize<AuthResponse>(content, options);
-            var token = desContent.Token;
-            _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            _loggerMock = new Mock<ILogger<SolarController>>();
+            _weatherDataProviderMock = new Mock<IWeatherDataProvider>();
+            _jsonProcessorMock = new Mock<IJsonProcessor>();
+            _cityRepository = new Mock<ICityRepository>();
+            _sunriseSunsetRepository = new Mock<ISunriseSunsetRepository>();
+            _controller = new SolarController(_loggerMock.Object, _weatherDataProviderMock.Object, _jsonProcessorMock.Object,
+                _cityRepository.Object, _sunriseSunsetRepository.Object);
         }
+
+        [Test]
+        public async Task GetLatLonReturnsNotFoundResultIfWeatherDataProviderFails()
+        {
+            var weatherData = "{}";
+            _weatherDataProviderMock.Setup(x => x.GetLatLon(It.IsAny<string>())).ThrowsAsync(new Exception());
+
+
+            var result = await _controller.GetSunriseSunset(It.IsAny<string>(), It.IsAny<DateTime>());
+
+            Assert.IsInstanceOf(typeof(NotFoundObjectResult), result.Result);
+        }
+
+        [Test]
+        public async Task GetSunriseSunsetReturnsNotFoundResultIfWeatherDataProviderFails()
+        {
+            var weatherData = "{}";
+            _weatherDataProviderMock.Setup(x =>
+                    x.GetSunriseSunset(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<DateTime>()))
+                    .ThrowsAsync(new Exception());
+
+
+            var result = await _controller.GetSunriseSunset(It.IsAny<string>(), It.IsAny<DateTime>());
+
+            Assert.IsInstanceOf(typeof(NotFoundObjectResult), result.Result);
+        }
+
 
 
         [Test]
-        public async Task GetSunriseSunset_ValidRequest_ReturnsSunriseSunset()
+        public async Task GetLatLontReturnsNotFoundResultIfWeatherDataIsInvalid()
         {
             // Arrange
-            var cityName = "New York";
-            var date = DateTime.Now.Date;
+            var expectedResponse = new GeocodingApiResponse();
+            var weatherData = "{}";
+            _weatherDataProviderMock.Setup(x => x.GetLatLon(It.IsAny<string>())).ReturnsAsync(weatherData);
+            _jsonProcessorMock.Setup(x => x.GetGeocodingApiResponse(weatherData)).Returns(expectedResponse);
 
             // Act
-            var response = await _client.GetAsync($"/Solar/GetByName?cityName={cityName}&date={date:yyyy-MM-dd}");
+            var result = await _controller.GetSunriseSunset(It.IsAny<string>(), It.IsAny<DateTime>());
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            var responseContent = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<SunriseSunsetResults>(responseContent, _jsonOptions);
-
-            // Add your specific assertions on the result here
+            Assert.IsInstanceOf(typeof(NotFoundObjectResult), result.Result);
         }
 
-
-        [TearDown]
-        public void TearDown()
+        [Test]
+        public async Task GetSunriseSunsettReturnsNotFoundResultIfWeatherDataIsInvalid()
         {
-            _client.Dispose();
+            // Arrange
+            var expectedResponse = new SunriseSunsetResults();
+            var weatherData = "{}";
+
+            _weatherDataProviderMock.Setup(x =>
+                x.GetSunriseSunset(It.IsAny<double>(), It.IsAny<double>(), It.IsAny<DateTime>())).ReturnsAsync(weatherData);
+
+            _jsonProcessorMock.Setup(x => x.Process(weatherData, It.IsAny<string>(), It.IsAny<DateTime>())).Returns(expectedResponse);
+
+            // Act
+            var result = await _controller.GetSunriseSunset(It.IsAny<string>(), It.IsAny<DateTime>());
+
+            // Assert
+            Assert.IsInstanceOf(typeof(NotFoundObjectResult), result.Result);
         }
     }
 }
