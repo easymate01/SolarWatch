@@ -18,8 +18,8 @@ AddAuthentication();
 AddIdentity();
 
 var app = builder.Build();
-AddAdmin();
 AddRoles();
+AddAdmin();
 
 
 // Configure the HTTP request pipeline.
@@ -39,7 +39,6 @@ app.MapControllers();
 
 Cors();
 app.Run();
-
 void AddIdentity()
 {
     builder.Services
@@ -165,6 +164,7 @@ async Task CreateAdminIfNotExists()
     using var scope = app.Services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     var adminDB = await userManager.FindByEmailAsync("admin@admin.com");
+
     if (adminDB == null)
     {
         var admin = new IdentityUser { UserName = "admin", Email = "admin@admin.com" };
@@ -172,10 +172,26 @@ async Task CreateAdminIfNotExists()
 
         if (adminCreated.Succeeded)
         {
-            await userManager.AddToRoleAsync(admin, "Admin");
+            var roleAssignment = await userManager.AddToRoleAsync(admin, "Admin");
+            if (roleAssignment.Succeeded)
+            {
+                // Log success
+                Console.WriteLine("Admin user and role assignment succeeded.");
+            }
+            else
+            {
+                // Log role assignment failure
+                Console.WriteLine("Failed to assign the Admin role to the user.");
+            }
+        }
+        else
+        {
+            // Log user creation failure
+            Console.WriteLine("Failed to create the admin user.");
         }
     }
 }
+
 
 void Cors()
 {
@@ -186,3 +202,5 @@ void Cors()
         builder.AllowAnyMethod();
     });
 }
+
+public partial class Program { };
